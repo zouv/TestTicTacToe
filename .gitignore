@@ -1,0 +1,10 @@
+Library
+Logs
+Packages
+Temp
+/obj/
+.vs
+.vsconfig
+*.sln
+*.csproj
+*.code-workspace
