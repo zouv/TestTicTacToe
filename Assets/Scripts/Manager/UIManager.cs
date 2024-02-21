@@ -2,6 +2,7 @@
  * UI 管理
  *  ! 注：此处为了简化逻辑，未添加界面动态加载、也没做界面层级管理
  */
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -10,6 +11,13 @@ using UnityEngine;
 
 public class UIManager : MonoBehaviour
 {
+    // define all ui names
+    public static class UINames
+    {
+        public const string Main = "UIMain";
+        public const string Game3T = "UIGame3T";
+    }
+
     public Canvas uiCanvas;
     public string initialUI;
 
@@ -20,11 +28,6 @@ public class UIManager : MonoBehaviour
         set { _instance = value; }
     }
 
-    public static class UINames
-    {
-        public const string Main = "UIMain";
-        public const string Game = "UIGame";
-    }
     private Dictionary<string, UIBase> _dicUI;
     private string _currUI;
 
@@ -46,17 +49,19 @@ public class UIManager : MonoBehaviour
         ChangeUI(String.IsNullOrWhiteSpace(initialUI) ? UINames.Main : initialUI);
     }
 
-    public void ChangeUI(string uiName)
+    public void ChangeUI(string uiName, UIArgs uiArgs = null)
     {
         // close old ui
         if (!String.IsNullOrEmpty(_currUI))
         {
             var old = _dicUI[_currUI];
             old.gameObject.SetActive(false);
+            old.Destory();
         }
 
         // open new ui
         var ins = _dicUI[uiName];
+        ins.Init(uiArgs);
         ins.gameObject.SetActive(true);
         _currUI = uiName;
     }

@@ -5,12 +5,14 @@ using UnityEngine.UI;
 
 public class UIMain : UIBase
 {
+    private Transform _tsPanelMask;
     private Transform _tsHelpPanel;
     private Transform _tsSettingsPanel;
     private Toggle _togFirstMove;
 
-    void Start()
+    void Awake()
     {
+        _tsPanelMask = this.transform.Find("Panels/Mask");
         _tsHelpPanel = this.transform.Find("Panels/HelpPanel");
         _tsSettingsPanel = this.transform.Find("Panels/SettingsPanel");
         _togFirstMove = this.transform.Find("Buttons/TogFirstMove").GetComponent<Toggle>();
@@ -19,21 +21,24 @@ public class UIMain : UIBase
     public void ShowHelpPane(bool value)
     {
         _tsHelpPanel.gameObject.SetActive(value);
+        _tsPanelMask.gameObject.SetActive(value);
     }
 
     public void ShowSettingPane(bool value)
     {
         _tsSettingsPanel.gameObject.SetActive(value);
+        _tsPanelMask.gameObject.SetActive(value);
     }
 
-    public void StartGame1(string uiName)
+    public void StartGameClassics()
     {
-        //Debug.Log($"StartGame1___ {_togFirstMove.isOn}, {uiName}");
-        UIManager.Instance.ChangeUI(uiName);
+        var args = new UIAGame3T { PlayerFirstMove = _togFirstMove.isOn, Flag = 1 };
+        UIManager.Instance.ChangeUI(UIManager.UINames.Game3T, args);
     }
 
-    public void StartGame2(string uiName)
+    public void StartGameFightToDeath()
     {
-        UIManager.Instance.ChangeUI(uiName);
+        var args = new UIAGame3T { PlayerFirstMove = _togFirstMove.isOn, Flag = 2 };
+        UIManager.Instance.ChangeUI(UIManager.UINames.Game3T, args);
     }
 }

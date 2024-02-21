@@ -284,7 +284,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   uiCanvas: {fileID: 125642319}
-  initialUI: 
+  initialUI: UIMain
 --- !u!1001 &690839848
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -944,7 +944,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8504616124050094625, guid: 77c0898ae1323014a9df7d2c15df5789, type: 3}
       propertyPath: m_Name
-      value: UIGame
+      value: UIGame3T
       objectReference: {fileID: 0}
     - target: {fileID: 8504616124050094625, guid: 77c0898ae1323014a9df7d2c15df5789, type: 3}
       propertyPath: m_IsActive
@@ -1009,6 +1009,6 @@ SceneRoots:
   m_Roots:
   - {fileID: 963194228}
   - {fileID: 705507995}
-  - {fileID: 125642320}
   - {fileID: 2060433809}
+  - {fileID: 125642320}
   - {fileID: 422971232}
