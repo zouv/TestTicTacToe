@@ -23,6 +23,11 @@ public class Comp3TPiece : MonoBehaviour
 
     void OnEnable()
     {
+        ResetPlace();
+    }
+
+    public void ResetPlace()
+    {
         _tsX.gameObject.SetActive(false);
         _tsO.gameObject.SetActive(false);
     }

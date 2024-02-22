@@ -4,11 +4,16 @@
 
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
-using static UnityEditor.PlayerSettings;
 
 public class G3TAIRunner : AIRunner
 {
+    public delegate void DeleUIOnPlace(PiecePos pos);
+    public DeleUIOnPlace UIOnAIPlace;
+    public delegate void DeleUIOnWin(Game3TResult flag);
+    public DeleUIOnWin UIOnWin;
+
     // ai 状态
     enum EAIState
     {
@@ -23,12 +28,18 @@ public class G3TAIRunner : AIRunner
     }
 
     // ai 落子位置
-    public PiecePos _aiPlace;
+    private PiecePos _aiPlace;
     public PiecePos AiPlace
     {
         set { _aiPlace = value; }
     }
 
+    private bool _isEnd = true;
+    public bool IsEnd
+    {
+        get { return _isEnd; }
+    }
+    
     private G3TAIHandler _handler;
     private G3TAIData _data;
 
@@ -45,9 +56,6 @@ public class G3TAIRunner : AIRunner
         _aiPlace.Reset();
     }
 
-    public delegate void DeleUIOnPlace(PiecePos pos);
-    public DeleUIOnPlace UIOnAIPlace;
-
     public override void Destory()
     {
         _handler.Destory();
@@ -59,6 +67,8 @@ public class G3TAIRunner : AIRunner
 
     public override void Update()
     {
+        if (_isEnd) return;
+
         // 进入 AI 回合
         if (_aiState == EAIState.TURN)
         {
@@ -75,7 +85,17 @@ public class G3TAIRunner : AIRunner
         }
     }
 
-    public override void SetAITurn()
+    public void Begin()
+    {
+        _data.Reset();
+
+        _aiState = EAIState.IDLE;
+        _aiPlace.Reset();
+
+        _isEnd = false;
+    }
+
+    public void SetAITurn()
     {
         _aiState = EAIState.TURN;
     }
@@ -87,13 +107,26 @@ public class G3TAIRunner : AIRunner
 
     public void DoAIPlace(PiecePos v)
     {
-        Debug.Log($"DoAIPlace___ {v}");
         _data.OnAIPlace(v);
         UIOnAIPlace(v);
+        var result = _handler.CheckWinner(PlaceState.AI);
+        if (result >= 0)
+        {
+            _isEnd = true;
+            var winFlag = result == 0 ? Game3TResult.Draw : Game3TResult.Lost;
+            UIOnWin(winFlag);
+        }
     }
 
     public void DoPlayerPlace(PiecePos v)
     {
         _data.OnPlayerPlace(v);
+        var result = _handler.CheckWinner(PlaceState.PLAYER);
+        if (result >= 0)
+        {
+            _isEnd = true;
+            var winFlag = result == 0 ? Game3TResult.Draw : Game3TResult.Win;
+            UIOnWin(winFlag);
+        }
     }
 }

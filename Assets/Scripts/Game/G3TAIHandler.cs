@@ -48,8 +48,9 @@ public class G3TAIHandler
      * 2、检查每个方向的连通情况
      *      a. 3空格，权重+1
      *      b. 2空格+1同棋，权重+3
-     *      c. 1空格+2同棋，权重+7
-     *      d. 其他情况，权重+0
+     *      c. 1空格+2异棋，全中+7
+     *      d. 1空格+2同棋，权重+15
+     *      e. 其他情况，权重+0
      *      注：2b 权重小于 1c, 2a 权重小于 1b
      * 3、遍历玩所有空格后，取权重最高的落子
      *      存在多个最高权重时，取第一个
@@ -63,8 +64,8 @@ public class G3TAIHandler
     private PiecePos EvaluationPick()
     {
         // 先重置
-        for (int x = 0; x < _weights.GetLength(0); x++)
-            for (int y = 0; y < _weights.GetLength(0); y++)
+        for (int y = 0; y < _weights.GetLength(0); y++)
+            for (int x = 0; x < _weights.GetLength(1); x++)
                 _weights[x,y] = -1;
 
         // 遍历空闲格子
@@ -72,9 +73,9 @@ public class G3TAIHandler
         pos.Reset();
         var maxWeight = -1;
         var board = _data.Board;
-        for (int x = 0; x < board.GetLength(0); x++)
+        for (int y = 0; y < board.GetLength(0); y++)
         {
-            for (int y = 0; y < board.GetLength(0); y++)
+            for (int x = 0; x < board.GetLength(1); x++)
             {
                 if (board[x, y] == PlaceState.Empty)
                 {
@@ -94,6 +95,26 @@ public class G3TAIHandler
         return pos;
     }
 
+    public int CheckWinner(int camp)
+    {
+        var count = 0;
+        var board = _data.Board;
+        for (int y = 0; y < board.GetLength(0); y++)
+        {
+            for (int x = 0; x < board.GetLength(1); x++)
+            {
+                if (board[x, y] != PlaceState.Empty)
+                {
+                    count++;
+                    var weight = EvaluationCalcWeight(x, y, camp);
+                    if (weight >= 10000) return 1;
+                }
+            }
+        }
+        if (count == board.GetLength(0) * board.GetLength(1)) return 0;
+        return -1;
+    }
+
     /*
      * 计算权重
      *  轴向：
@@ -101,30 +122,31 @@ public class G3TAIHandler
      *    ↓
      *    y
      */
-    private int EvaluationCalcWeight(int x, int y)
+    private int EvaluationCalcWeight(int x, int y, int camp = PlaceState.AI)
     {
         // →
         var weight = 0;
-        weight += CalcWeight(x, y, 1, 0);
+        weight += CalcWeight(x, y, 1, 0, camp);
 
         // ↓
-        weight += CalcWeight(x, y, 0, 1);
+        weight += CalcWeight(x, y, 0, 1, camp);
 
         // ↘
-        weight += CalcWeight(x, y, 1, 1);
+        weight += CalcWeight(x, y, 1, 1, camp);
 
         // ↗
-        weight += CalcWeight(x, y, 1, -1);
+        weight += CalcWeight(x, y, 1, -1, camp);
 
-        //Debug.Log($"EvaluationPick___ {x}, {y}: {weight}");
         return weight;
     }
 
-    private int CalcWeight(int oriX, int oriY, int dirX, int dirY)
+    private int CalcWeight(int oriX, int oriY, int dirX, int dirY, int camp)
     {
         var board = _data.Board;
         var lineLen = board.GetLength(0);
-        int comp = 0, empty = 0;
+        int same = 0, diff = 0, empty = 0;
+        int sameCamp = PlaceState.AI == camp ? camp : PlaceState.PLAYER;
+        int diffCamp = PlaceState.AI != camp ? camp : PlaceState.PLAYER;
         int x = oriX, y = oriY;
         int count = 0;
         while(count < lineLen)
@@ -132,8 +154,9 @@ public class G3TAIHandler
             count++;
             if (x >= 0 && x < lineLen && y >= 0 && y < lineLen)
             {
-                if (board[x, y] == PlaceState.AI) comp++;
-                else if (board[x, y] == PlaceState.Empty) empty++;
+                if (board[x, y] == sameCamp) same++;
+                else if (board[x, y] == diffCamp) diff++;
+                else empty++;
             }
 
             x += dirX;
@@ -159,8 +182,11 @@ public class G3TAIHandler
         }
 
         if (empty == 3) return 1;
-        else if (empty == 2 && comp == 1) return 3;
-        else if (empty == 1 && comp == 2) return 7;
+        else if (empty == 2 && diff == 1) return 2;
+        else if (empty == 2 && same == 1) return 3;
+        else if (empty == 1 && diff == 2) return 7;
+        else if (empty == 1 && same == 2) return 15;
+        else if (same == 3) return 10000;
         else return 0;
     }
 }

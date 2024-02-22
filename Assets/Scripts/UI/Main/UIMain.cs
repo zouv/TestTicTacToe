@@ -32,13 +32,13 @@ public class UIMain : UIBase
 
     public void StartGameClassics()
     {
-        var args = new UIAGame3T { PlayerFirstMove = _togFirstMove.isOn, Flag = 1 };
+        var args = new UIAGame3T { playerFirst = _togFirstMove.isOn, flag = Game3TFlag.Classics };
         UIManager.Instance.ChangeUI(UIManager.UINames.Game3T, args);
     }
 
     public void StartGameFightToDeath()
     {
-        var args = new UIAGame3T { PlayerFirstMove = _togFirstMove.isOn, Flag = 2 };
+        var args = new UIAGame3T { playerFirst = _togFirstMove.isOn, flag = Game3TFlag.FightToDeath };
         UIManager.Instance.ChangeUI(UIManager.UINames.Game3T, args);
     }
 }

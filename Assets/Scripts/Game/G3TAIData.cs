@@ -20,6 +20,13 @@ public class G3TAIData
         _board = null;
     }
 
+    public void Reset()
+    {
+        for (int y = 0; y < _board.GetLength(0); y++)
+            for (int x = 0; x < _board.GetLength(1); x++)
+                _board[x, y] = PlaceState.Empty;
+    }
+
     public void OnAIPlace(PiecePos pos)
     {
         _board[pos.x, pos.y] = PlaceState.AI;

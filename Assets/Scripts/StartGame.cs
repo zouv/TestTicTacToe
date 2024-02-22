@@ -8,8 +8,6 @@ public class StartGame : MonoBehaviour
     {
         var uiMgr = GetComponent<UIManager>();
         UIManager.Instance = uiMgr;
-
         UIManager.Instance.Init();
-        GameplayMgr.Instance.Init();
     }
 }
